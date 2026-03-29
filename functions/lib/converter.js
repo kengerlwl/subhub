@@ -35,12 +35,12 @@ export function toClash(nodes, rules = 'minimal') {
     proxies: proxies,
     'proxy-groups': [
       {
-        name: '🚀 节点选择',
+        name: 'Proxy',
         type: 'select',
-        proxies: ['♻️ 自动选择', 'DIRECT', ...proxyNames],
+        proxies: ['Auto', 'DIRECT', ...proxyNames],
       },
       {
-        name: '♻️ 自动选择',
+        name: 'Auto',
         type: 'url-test',
         proxies: proxyNames,
         url: 'http://www.gstatic.com/generate_204',
@@ -295,7 +295,7 @@ function nodeToSurgeLine(node) {
 }
 
 function getRuleSet(type, proxyNames) {
-  const proxy = '🚀 节点选择';
+  const proxy = 'Proxy';
   if (type === 'none') {
     return [`MATCH,${proxy}`];
   }
@@ -351,15 +351,15 @@ function yamlStringify(obj, indent = 0) {
 
 function yamlValue(v) {
   if (typeof v === 'string') {
-    // Always quote strings containing non-ASCII (emoji, CJK), special YAML
-    // chars, or that look like booleans/numbers.
-    const needsQuote = v === '' || v === 'true' || v === 'false'
-      || /[:{}\[\],&*?|>!%#@`]/.test(v) || /^\d+$/.test(v)
-      || /[^\x20-\x7E]/.test(v);
-    if (needsQuote) {
-      return `"${v.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`;
+    // Strip all non-ASCII characters (emoji flags, CJK, etc.) to ensure
+    // strict YAML compatibility across all parsers (mobile Clash cores,
+    // PyYAML, etc. reject control bytes in emoji UTF-8 sequences).
+    const ascii = v.replace(/[^\x20-\x7E]/g, '').trim();
+    const s = ascii || v.replace(/[^\x20-\x7E]/g, '_').trim();
+    if (s === '' || s === 'true' || s === 'false' || /[:{}\[\],&*?|>!%#@`]/.test(s) || /^\d+$/.test(s)) {
+      return `"${s.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`;
     }
-    return v;
+    return s;
   }
   if (typeof v === 'boolean') return v ? 'true' : 'false';
   if (typeof v === 'number') return String(v);
