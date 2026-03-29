@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SubHub - 免费节点 & 安全订阅转换</title>
+  <meta name="description" content="SubHub 提供高质量免费代理节点聚合和安全的订阅格式转换服务，支持 Clash、V2Ray、Sing-Box、Surge、Shadowrocket 等客户端。">
+  <meta name="keywords" content="免费节点,订阅转换,clash订阅,v2ray免费,sing-box,surge,shadowrocket,免费代理,翻墙节点">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚀</text></svg>">
+  <style>
+    :root {
+      --bg: #0d1117;
+      --bg-card: #161b22;
+      --bg-input: #0d1117;
+      --border: #30363d;
+      --text: #e6edf3;
+      --text-muted: #8b949e;
+      --accent: #58a6ff;
+      --accent-hover: #79c0ff;
+      --green: #3fb950;
+      --orange: #d29922;
+      --red: #f85149;
+      --radius: 8px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    .container { max-width: 960px; margin: 0 auto; padding: 0 20px; }
+
+    /* Header */
+    header {
+      border-bottom: 1px solid var(--border);
+      padding: 16px 0;
+    }
+    header .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .logo { font-size: 20px; font-weight: 700; color: var(--text); text-decoration: none; }
+    .logo span { color: var(--accent); }
+    nav a {
+      color: var(--text-muted);
+      text-decoration: none;
+      margin-left: 24px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+    nav a:hover, nav a.active { color: var(--text); }
+
+    /* Hero */
+    .hero {
+      text-align: center;
+      padding: 48px 0 32px;
+    }
+    .hero h1 { font-size: 32px; margin-bottom: 12px; }
+    .hero h1 em { font-style: normal; color: var(--accent); }
+    .hero p { color: var(--text-muted); font-size: 16px; max-width: 600px; margin: 0 auto; }
+
+    /* Sub Links */
+    .sub-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      margin: 24px 0;
+    }
+    .sub-box h3 { font-size: 16px; margin-bottom: 16px; color: var(--text-muted); }
+    .target-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    .target-tab {
+      padding: 6px 16px;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 13px;
+      transition: all 0.2s;
+    }
+    .target-tab:hover { border-color: var(--accent); color: var(--accent); }
+    .target-tab.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .sub-url-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .sub-url-input {
+      flex: 1;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 10px 14px;
+      color: var(--text);
+      font-size: 13px;
+      font-family: 'SF Mono', Monaco, Consolas, monospace;
+      outline: none;
+    }
+    .sub-url-input:focus { border-color: var(--accent); }
+    .copy-btn {
+      padding: 10px 20px;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius);
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      white-space: nowrap;
+      transition: background 0.2s;
+    }
+    .copy-btn:hover { background: var(--accent-hover); }
+    .copy-btn.copied { background: var(--green); }
+
+    /* Stats */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin: 24px 0;
+    }
+    .stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      text-align: center;
+    }
+    .stat-value { font-size: 28px; font-weight: 700; color: var(--accent); }
+    .stat-label { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+
+    /* Pages */
+    .page { display: none; }
+    .page.active { display: block; }
+
+    /* Node List */
+    .filters {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+    .filter-select {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 8px 12px;
+      color: var(--text);
+      font-size: 13px;
+      outline: none;
+    }
+    .node-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+    .node-table th {
+      text-align: left;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-muted);
+      font-weight: 500;
+      font-size: 13px;
+    }
+    .node-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    .node-table tr:hover { background: rgba(88, 166, 255, 0.05); }
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 500;
+    }
+    .badge-vmess { background: rgba(88, 166, 255, 0.15); color: var(--accent); }
+    .badge-vless { background: rgba(63, 185, 80, 0.15); color: var(--green); }
+    .badge-trojan { background: rgba(210, 153, 34, 0.15); color: var(--orange); }
+    .badge-ss { background: rgba(248, 81, 73, 0.15); color: var(--red); }
+    .badge-ssr { background: rgba(248, 81, 73, 0.15); color: var(--red); }
+    .badge-hysteria2 { background: rgba(188, 140, 255, 0.15); color: #bc8cff; }
+
+    /* Convert Page */
+    .convert-form textarea {
+      width: 100%;
+      min-height: 120px;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px;
+      color: var(--text);
+      font-size: 13px;
+      font-family: 'SF Mono', Monaco, Consolas, monospace;
+      resize: vertical;
+      outline: none;
+    }
+    .convert-form textarea:focus { border-color: var(--accent); }
+    .form-group { margin-bottom: 16px; }
+    .form-label { display: block; font-size: 14px; color: var(--text-muted); margin-bottom: 8px; }
+    .radio-group { display: flex; flex-wrap: wrap; gap: 8px; }
+    .radio-label {
+      padding: 6px 16px;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 13px;
+      color: var(--text-muted);
+      transition: all 0.2s;
+    }
+    .radio-label:hover { border-color: var(--accent); color: var(--accent); }
+    .radio-label input { display: none; }
+    .radio-label:has(input:checked) { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .privacy-note {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px;
+      background: rgba(63, 185, 80, 0.08);
+      border: 1px solid rgba(63, 185, 80, 0.2);
+      border-radius: var(--radius);
+      font-size: 13px;
+      color: var(--green);
+      margin: 16px 0;
+    }
+    .result-box {
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px;
+      max-height: 300px;
+      overflow: auto;
+      font-size: 12px;
+      font-family: 'SF Mono', Monaco, Consolas, monospace;
+      white-space: pre-wrap;
+      word-break: break-all;
+      color: var(--text-muted);
+      display: none;
+    }
+    .result-actions {
+      display: none;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .btn-secondary {
+      padding: 8px 16px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text);
+      cursor: pointer;
+      font-size: 13px;
+      transition: all 0.2s;
+    }
+    .btn-secondary:hover { border-color: var(--accent); }
+
+    /* Footer */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 24px 0;
+      margin-top: 48px;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+    footer a { color: var(--accent); text-decoration: none; }
+
+    /* Loading */
+    .loading { text-align: center; padding: 40px; color: var(--text-muted); }
+    .spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Responsive */
+    @media (max-width: 640px) {
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .hero h1 { font-size: 24px; }
+      .sub-url-row { flex-direction: column; }
+      .copy-btn { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <a href="#" class="logo" onclick="showPage('home')">🚀 Sub<span>Hub</span></a>
+      <nav>
+        <a onclick="showPage('home')" class="active" data-page="home">首页</a>
+        <a onclick="showPage('nodes')" data-page="nodes">节点列表</a>
+        <a onclick="showPage('convert')" data-page="convert">订阅转换</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- 首页 -->
+  <div id="page-home" class="page active">
+    <div class="container">
+      <div class="hero">
+        <h1>免费节点 & <em>安全订阅转换</em></h1>
+        <p>自动聚合高质量免费代理节点，提供安全的订阅格式转换。支持 Clash、V2Ray、Sing-Box、Surge、Shadowrocket。</p>
+      </div>
+
+      <div class="sub-box">
+        <h3>📋 一键复制订阅链接</h3>
+        <div class="target-tabs" id="targetTabs">
+          <button class="target-tab active" data-target="clash">Clash</button>
+          <button class="target-tab" data-target="v2ray">V2Ray</button>
+          <button class="target-tab" data-target="singbox">Sing-Box</button>
+          <button class="target-tab" data-target="surge">Surge</button>
+          <button class="target-tab" data-target="shadowrocket">Shadowrocket</button>
+        </div>
+        <div class="sub-url-row">
+          <input type="text" class="sub-url-input" id="subUrl" readonly>
+          <button class="copy-btn" id="copyBtn" onclick="copySubUrl()">复制</button>
+        </div>
+      </div>
+
+      <div class="stats-grid" id="statsGrid">
+        <div class="stat-card">
+          <div class="stat-value" id="statNodes">-</div>
+          <div class="stat-label">可用节点</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="statProtocols">-</div>
+          <div class="stat-label">协议类型</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="statCountries">-</div>
+          <div class="stat-label">覆盖地区</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="statUpdated">-</div>
+          <div class="stat-label">上次更新</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 节点列表 -->
+  <div id="page-nodes" class="page">
+    <div class="container" style="padding-top: 24px;">
+      <h2 style="margin-bottom: 16px;">节点列表</h2>
+      <div class="filters">
+        <select class="filter-select" id="filterProtocol" onchange="filterNodes()">
+          <option value="">全部协议</option>
+          <option value="vmess">VMess</option>
+          <option value="vless">VLESS</option>
+          <option value="trojan">Trojan</option>
+          <option value="ss">Shadowsocks</option>
+          <option value="hysteria2">Hysteria2</option>
+        </select>
+        <select class="filter-select" id="filterCountry" onchange="filterNodes()">
+          <option value="">全部地区</option>
+        </select>
+      </div>
+      <div id="nodeTableContainer">
+        <div class="loading"><span class="spinner"></span> 加载中...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 订阅转换 -->
+  <div id="page-convert" class="page">
+    <div class="container" style="padding-top: 24px;">
+      <h2 style="margin-bottom: 16px;">🔄 订阅转换</h2>
+      <div class="sub-box">
+        <div class="convert-form">
+          <div class="form-group">
+            <label class="form-label">订阅链接或节点分享链接（支持多行）</label>
+            <textarea id="convertInput" placeholder="https://example.com/sub?token=xxx&#10;vmess://eyJhZGQiOi...&#10;vless://uuid@server:port?..."></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">目标格式</label>
+            <div class="radio-group">
+              <label class="radio-label"><input type="radio" name="convertTarget" value="clash" checked> Clash/Mihomo</label>
+              <label class="radio-label"><input type="radio" name="convertTarget" value="v2ray"> V2RayN</label>
+              <label class="radio-label"><input type="radio" name="convertTarget" value="singbox"> Sing-Box</label>
+              <label class="radio-label"><input type="radio" name="convertTarget" value="surge"> Surge</label>
+              <label class="radio-label"><input type="radio" name="convertTarget" value="shadowrocket"> Shadowrocket</label>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">分流规则</label>
+            <div class="radio-group">
+              <label class="radio-label"><input type="radio" name="convertRules" value="minimal" checked> 精简版（推荐）</label>
+              <label class="radio-label"><input type="radio" name="convertRules" value="full"> 完整版</label>
+              <label class="radio-label"><input type="radio" name="convertRules" value="none"> 无规则</label>
+            </div>
+          </div>
+          <div class="privacy-note">🔒 隐私承诺：您的订阅链接不会被存储或记录，所有转换在内存中完成</div>
+          <button class="copy-btn" style="width: 100%;" onclick="doConvert()">开始转换</button>
+        </div>
+        <div class="result-box" id="convertResult"></div>
+        <div class="result-actions" id="resultActions">
+          <button class="btn-secondary" onclick="copyResult()">📋 复制内容</button>
+          <button class="btn-secondary" onclick="downloadResult()">⬇️ 下载文件</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="container">
+      <p>SubHub — 免费节点聚合 & 安全订阅转换 | <a href="https://github.com/kengerlwl/subhub" target="_blank">GitHub</a></p>
+      <p style="margin-top: 4px;">节点来源于公开互联网，仅供学习研究使用</p>
+    </div>
+  </footer>
+
+  <script>
+    const BASE_URL = location.origin;
+    let currentTarget = 'clash';
+    let nodesData = null;
+    let convertResultText = '';
+
+    // 初始化
+    document.addEventListener('DOMContentLoaded', () => {
+      updateSubUrl();
+      loadStats();
+
+      // Tab 切换
+      document.querySelectorAll('.target-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+          document.querySelectorAll('.target-tab').forEach(t => t.classList.remove('active'));
+          tab.classList.add('active');
+          currentTarget = tab.dataset.target;
+          updateSubUrl();
+        });
+      });
+    });
+
+    function updateSubUrl() {
+      document.getElementById('subUrl').value = `${BASE_URL}/api/sub?target=${currentTarget}`;
+    }
+
+    function showPage(page) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById(`page-${page}`).classList.add('active');
+      document.querySelectorAll('nav a').forEach(a => {
+        a.classList.toggle('active', a.dataset.page === page);
+      });
+      if (page === 'nodes' && !nodesData) loadNodes();
+    }
+
+    async function copySubUrl() {
+      const url = document.getElementById('subUrl').value;
+      await navigator.clipboard.writeText(url);
+      const btn = document.getElementById('copyBtn');
+      btn.textContent = '已复制 ✓';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = '复制'; btn.classList.remove('copied'); }, 2000);
+    }
+
+    async function loadStats() {
+      try {
+        const resp = await fetch(`${BASE_URL}/api/stats`);
+        const data = await resp.json();
+        document.getElementById('statNodes').textContent = data.totalNodes || 0;
+        document.getElementById('statProtocols').textContent = Object.keys(data.protocols || {}).length;
+        document.getElementById('statCountries').textContent = Object.keys(data.countries || {}).length;
+        if (data.updatedAt) {
+          const ago = timeAgo(new Date(data.updatedAt));
+          document.getElementById('statUpdated').textContent = ago;
+        }
+      } catch (e) {
+        console.error('Failed to load stats:', e);
+      }
+    }
+
+    async function loadNodes() {
+      try {
+        const resp = await fetch(`${BASE_URL}/api/nodes`);
+        nodesData = await resp.json();
+        populateCountryFilter(nodesData.nodes);
+        renderNodes(nodesData.nodes);
+      } catch (e) {
+        document.getElementById('nodeTableContainer').innerHTML = '<p style="color:var(--red)">加载失败，请稍后重试</p>';
+      }
+    }
+
+    function populateCountryFilter(nodes) {
+      const countries = [...new Set(nodes.map(n => n.country))].sort();
+      const select = document.getElementById('filterCountry');
+      const flags = { US:'🇺🇸', JP:'🇯🇵', HK:'🇭🇰', SG:'🇸🇬', TW:'🇹🇼', KR:'🇰🇷', DE:'🇩🇪', GB:'🇬🇧', FR:'🇫🇷', CA:'🇨🇦', AU:'🇦🇺', IN:'🇮🇳', RU:'🇷🇺', NL:'🇳🇱', TR:'🇹🇷', UN:'🏳️' };
+      for (const c of countries) {
+        const opt = document.createElement('option');
+        opt.value = c;
+        opt.textContent = `${flags[c] || '🏳️'} ${c}`;
+        select.appendChild(opt);
+      }
+    }
+
+    function filterNodes() {
+      if (!nodesData) return;
+      const protocol = document.getElementById('filterProtocol').value;
+      const country = document.getElementById('filterCountry').value;
+      let nodes = nodesData.nodes;
+      if (protocol) nodes = nodes.filter(n => n.type === protocol);
+      if (country) nodes = nodes.filter(n => n.country === country);
+      renderNodes(nodes);
+    }
+
+    function renderNodes(nodes) {
+      const flags = { US:'🇺🇸', JP:'🇯🇵', HK:'🇭🇰', SG:'🇸🇬', TW:'🇹🇼', KR:'🇰🇷', DE:'🇩🇪', GB:'🇬🇧', FR:'🇫🇷', CA:'🇨🇦', AU:'🇦🇺', IN:'🇮🇳', RU:'🇷🇺', NL:'🇳🇱', TR:'🇹🇷', UN:'🏳️' };
+      if (nodes.length === 0) {
+        document.getElementById('nodeTableContainer').innerHTML = '<p style="color:var(--text-muted);text-align:center;padding:40px;">暂无节点数据</p>';
+        return;
+      }
+      let html = `<table class="node-table"><thead><tr><th>协议</th><th>名称</th><th>服务器</th><th>端口</th><th>地区</th></tr></thead><tbody>`;
+      for (const n of nodes.slice(0, 200)) {
+        html += `<tr>
+          <td><span class="badge badge-${n.type}">${n.type.toUpperCase()}</span></td>
+          <td>${escapeHtml(n.name)}</td>
+          <td style="font-family:monospace;font-size:12px;">${escapeHtml(n.server)}</td>
+          <td>${n.port}</td>
+          <td>${flags[n.country] || '🏳️'} ${n.country}</td>
+        </tr>`;
+      }
+      html += `</tbody></table>`;
+      if (nodes.length > 200) html += `<p style="text-align:center;color:var(--text-muted);padding:16px;">显示前 200 个，共 ${nodes.length} 个节点</p>`;
+      document.getElementById('nodeTableContainer').innerHTML = html;
+    }
+
+    async function doConvert() {
+      const input = document.getElementById('convertInput').value.trim();
+      if (!input) { alert('请输入订阅链接或节点链接'); return; }
+
+      const target = document.querySelector('input[name="convertTarget"]:checked').value;
+      const rules = document.querySelector('input[name="convertRules"]:checked').value;
+
+      const resultBox = document.getElementById('convertResult');
+      const actions = document.getElementById('resultActions');
+      resultBox.style.display = 'block';
+      resultBox.textContent = '转换中...';
+      actions.style.display = 'none';
+
+      try {
+        // 判断是 URL 还是节点内容
+        const isUrl = input.startsWith('http://') || input.startsWith('https://');
+        let resp;
+
+        if (isUrl) {
+          resp = await fetch(`${BASE_URL}/api/convert?url=${encodeURIComponent(input)}&target=${target}&rules=${rules}`);
+        } else {
+          resp = await fetch(`${BASE_URL}/api/convert`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ content: input, target, rules }),
+          });
+        }
+
+        if (!resp.ok) {
+          const err = await resp.json().catch(() => ({ error: 'Unknown error' }));
+          resultBox.textContent = `转换失败: ${err.error}`;
+          return;
+        }
+
+        convertResultText = await resp.text();
+        resultBox.textContent = convertResultText;
+        actions.style.display = 'flex';
+      } catch (e) {
+        resultBox.textContent = `转换失败: ${e.message}`;
+      }
+    }
+
+    async function copyResult() {
+      await navigator.clipboard.writeText(convertResultText);
+      alert('已复制到剪贴板');
+    }
+
+    function downloadResult() {
+      const target = document.querySelector('input[name="convertTarget"]:checked').value;
+      const ext = target === 'singbox' ? 'json' : target === 'clash' ? 'yaml' : 'txt';
+      const blob = new Blob([convertResultText], { type: 'text/plain' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `subhub_${target}.${ext}`;
+      a.click();
+    }
+
+    function timeAgo(date) {
+      const seconds = Math.floor((new Date() - date) / 1000);
+      if (seconds < 60) return `${seconds}秒前`;
+      if (seconds < 3600) return `${Math.floor(seconds / 60)}分钟前`;
+      if (seconds < 86400) return `${Math.floor(seconds / 3600)}小时前`;
+      return `${Math.floor(seconds / 86400)}天前`;
+    }
+
+    function escapeHtml(str) {
+      return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+  </script>
+</body>
+</html>

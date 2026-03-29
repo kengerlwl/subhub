@@ -1,0 +1,9 @@
+name = "subhub"
+pages_build_output_dir = "."
+compatibility_date = "2024-01-01"
+
+[[kv_namespaces]]
+binding = "SUBHUB_KV"
+id = "ffe290b82ba0489f833eac150c7155ac"
+
+# NOTE: Pages 不支持 cron triggers，定时采集需通过单独的 Worker 或 Cloudflare Dashboard 设置

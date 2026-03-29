@@ -1,0 +1,13 @@
+{
+  "name": "subhub",
+  "version": "1.0.0",
+  "description": "SubHub - 免费节点聚合 & 安全订阅转换",
+  "private": true,
+  "scripts": {
+    "dev": "npx wrangler pages dev . --kv=SUBHUB_KV --port=8788",
+    "deploy": "npx wrangler pages deploy ."
+  },
+  "devDependencies": {
+    "wrangler": "^3.0.0"
+  }
+}
