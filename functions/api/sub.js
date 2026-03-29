@@ -14,6 +14,7 @@ export async function onRequestGet(context) {
   const country = url.searchParams.get('country') || '';
   const limit = parseInt(url.searchParams.get('limit') || '0');
   const rules = url.searchParams.get('rules') || 'minimal';
+  const kernel = url.searchParams.get('kernel') || 'clash'; // clash (default) or mihomo
 
   try {
     // 从 KV 读取节点数据
@@ -50,7 +51,7 @@ export async function onRequestGet(context) {
     switch (target.toLowerCase()) {
       case 'clash':
       case 'mihomo':
-        content = toClash(nodes, rules);
+        content = toClash(nodes, rules, kernel);
         contentType = 'text/yaml; charset=utf-8';
         break;
       case 'v2ray':
@@ -72,7 +73,7 @@ export async function onRequestGet(context) {
         contentType = 'text/plain; charset=utf-8';
         break;
       default:
-        content = toClash(nodes, rules);
+        content = toClash(nodes, rules, kernel);
         contentType = 'text/yaml; charset=utf-8';
     }
 

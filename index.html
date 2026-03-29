@@ -329,6 +329,11 @@
           <button class="target-tab" data-target="surge">Surge</button>
           <button class="target-tab" data-target="shadowrocket">Shadowrocket</button>
         </div>
+        <div style="margin-top:8px;display:flex;align-items:center;gap:12px;">
+          <label style="color:var(--text-muted);font-size:13px;">内核：</label>
+          <label style="font-size:13px;cursor:pointer;"><input type="radio" name="kernel" value="clash" checked onchange="updateSubUrl()"> Clash <span style="color:var(--text-muted);">(兼容)</span></label>
+          <label style="font-size:13px;cursor:pointer;"><input type="radio" name="kernel" value="mihomo" onchange="updateSubUrl()"> Mihomo <span style="color:var(--text-muted);">(含 Hysteria2/VLESS)</span></label>
+        </div>
         <div class="sub-url-row">
           <input type="text" class="sub-url-input" id="subUrl" readonly>
           <button class="copy-btn" id="copyBtn" onclick="copySubUrl()">复制</button>
@@ -449,7 +454,9 @@
     });
 
     function updateSubUrl() {
-      document.getElementById('subUrl').value = `${BASE_URL}/api/sub?target=${currentTarget}`;
+      const kernel = document.querySelector('input[name="kernel"]:checked')?.value || 'clash';
+      const params = `target=${currentTarget}` + (kernel === 'mihomo' ? '&kernel=mihomo' : '');
+      document.getElementById('subUrl').value = `${BASE_URL}/api/sub?${params}`;
     }
 
     function showPage(page) {

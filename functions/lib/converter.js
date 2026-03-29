@@ -6,8 +6,12 @@
 /**
  * 转换为 Clash/Mihomo YAML 格式
  */
-export function toClash(nodes, rules = 'minimal') {
-  const proxies = nodes.map(node => nodeToClashProxy(node)).filter(Boolean);
+// Protocol types only supported by Mihomo/Meta kernel (not original Clash)
+const MIHOMO_ONLY_TYPES = new Set(['hysteria2', 'vless']);
+
+export function toClash(nodes, rules = 'minimal', kernel = 'clash') {
+  const filtered = kernel === 'mihomo' ? nodes : nodes.filter(n => !MIHOMO_ONLY_TYPES.has(n.type));
+  const proxies = filtered.map(node => nodeToClashProxy(node)).filter(Boolean);
 
   // Deduplicate proxy names — Clash requires unique names
   const nameCount = {};
