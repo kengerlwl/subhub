@@ -8,6 +8,19 @@
  */
 export function toClash(nodes, rules = 'minimal') {
   const proxies = nodes.map(node => nodeToClashProxy(node)).filter(Boolean);
+
+  // Deduplicate proxy names — Clash requires unique names
+  const nameCount = {};
+  for (const proxy of proxies) {
+    const base = proxy.name;
+    if (nameCount[base] === undefined) {
+      nameCount[base] = 0;
+    } else {
+      nameCount[base]++;
+      proxy.name = `${base}-${nameCount[base]}`;
+    }
+  }
+
   const proxyNames = proxies.map(p => p.name);
 
   const ruleSet = getRuleSet(rules, proxyNames);
@@ -338,8 +351,13 @@ function yamlStringify(obj, indent = 0) {
 
 function yamlValue(v) {
   if (typeof v === 'string') {
-    if (v === '' || v === 'true' || v === 'false' || /[:{}\[\],&*?|>!%#@`]/.test(v) || /^\d+$/.test(v)) {
-      return `"${v.replace(/"/g, '\\"')}"`;
+    // Always quote strings containing non-ASCII (emoji, CJK), special YAML
+    // chars, or that look like booleans/numbers.
+    const needsQuote = v === '' || v === 'true' || v === 'false'
+      || /[:{}\[\],&*?|>!%#@`]/.test(v) || /^\d+$/.test(v)
+      || /[^\x20-\x7E]/.test(v);
+    if (needsQuote) {
+      return `"${v.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`;
     }
     return v;
   }
