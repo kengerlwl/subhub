@@ -13,12 +13,13 @@ export function toClash(nodes, rules = 'minimal', kernel = 'clash') {
   const filtered = kernel === 'mihomo' ? nodes : nodes.filter(n => !MIHOMO_ONLY_TYPES.has(n.type));
   const proxies = filtered.map(node => nodeToClashProxy(node)).filter(Boolean);
 
-  // Deduplicate proxy names — Clash requires unique names
+  // Sanitize then deduplicate proxy names — Clash requires final rendered names to be unique
   const nameCount = {};
   for (const proxy of proxies) {
-    const base = proxy.name;
+    const base = sanitizeClashName(proxy.name);
     if (nameCount[base] === undefined) {
       nameCount[base] = 0;
+      proxy.name = base;
     } else {
       nameCount[base]++;
       proxy.name = `${base}-${nameCount[base]}`;
@@ -355,11 +356,7 @@ function yamlStringify(obj, indent = 0) {
 
 function yamlValue(v) {
   if (typeof v === 'string') {
-    // Strip all non-ASCII characters (emoji flags, CJK, etc.) to ensure
-    // strict YAML compatibility across all parsers (mobile Clash cores,
-    // PyYAML, etc. reject control bytes in emoji UTF-8 sequences).
-    const ascii = v.replace(/[^\x20-\x7E]/g, '').trim();
-    const s = ascii || v.replace(/[^\x20-\x7E]/g, '_').trim();
+    const s = sanitizeClashName(v);
     if (s === '' || s === 'true' || s === 'false' || /[:{}\[\],&*?|>!%#@`]/.test(s) || /^\d+$/.test(s)) {
       return `"${s.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`;
     }
@@ -368,4 +365,10 @@ function yamlValue(v) {
   if (typeof v === 'boolean') return v ? 'true' : 'false';
   if (typeof v === 'number') return String(v);
   return String(v);
+}
+
+function sanitizeClashName(v) {
+  const ascii = String(v).replace(/[^\x20-\x7E]/g, '').trim();
+  const cleaned = ascii || String(v).replace(/[^\x20-\x7E]/g, '_').trim();
+  return cleaned || 'proxy';
 }
