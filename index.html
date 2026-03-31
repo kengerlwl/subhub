@@ -3,10 +3,48 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SubHub - 免费节点 & 安全订阅转换</title>
-  <meta name="description" content="SubHub 提供高质量免费代理节点聚合和安全的订阅格式转换服务，支持 Clash、V2Ray、Sing-Box、Surge、Shadowrocket 等客户端。">
-  <meta name="keywords" content="免费节点,订阅转换,clash订阅,v2ray免费,sing-box,surge,shadowrocket,免费代理,翻墙节点">
+  <title>SubHub - 免费节点聚合 & Clash/V2Ray 订阅转换 | 4000+ 节点每日更新</title>
+  <meta name="description" content="SubHub 免费提供 4000+ 高质量代理节点，自动聚合去重，每 30 分钟更新。支持一键生成 Clash、V2Ray、Sing-Box、Surge、Shadowrocket 订阅链接，在线订阅格式转换，完全免费无广告。">
+  <meta name="keywords" content="免费节点,订阅转换,clash订阅,v2ray免费,sing-box订阅,surge订阅,shadowrocket订阅,免费代理,clash订阅链接,v2ray订阅链接,免费vpn节点,节点聚合,订阅格式转换,mihomo订阅">
+  <link rel="canonical" href="https://sub.156354.xyz/">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="SubHub - 免费节点聚合 & 订阅转换">
+  <meta property="og:description" content="4000+ 免费代理节点，支持 Clash/V2Ray/Sing-Box/Surge/Shadowrocket，每 30 分钟自动更新，一键复制订阅链接。">
+  <meta property="og:url" content="https://sub.156354.xyz/">
+  <meta property="og:site_name" content="SubHub">
+  <meta property="og:locale" content="zh_CN">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="SubHub - 免费节点聚合 & 订阅转换">
+  <meta name="twitter:description" content="4000+ 免费代理节点，支持 Clash/V2Ray/Sing-Box/Surge/Shadowrocket，一键订阅。">
+
+  <!-- Additional SEO -->
+  <meta name="robots" content="index, follow">
+  <meta name="author" content="SubHub">
+  <meta name="theme-color" content="#0d1117">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚀</text></svg>">
+
+  <!-- Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "SubHub",
+    "url": "https://sub.156354.xyz/",
+    "description": "免费代理节点聚合与订阅格式转换平台，支持 Clash、V2Ray、Sing-Box、Surge、Shadowrocket 等客户端。",
+    "applicationCategory": "UtilitiesApplication",
+    "operatingSystem": "Web",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "featureList": ["免费节点聚合", "订阅格式转换", "Clash 订阅", "V2Ray 订阅", "Sing-Box 订阅", "每30分钟自动更新"]
+  }
+  </script>
   <style>
     :root {
       --bg: #0d1117;
@@ -423,6 +461,20 @@
       </div>
     </div>
   </div>
+
+  <!-- SEO: Static content visible to crawlers (SPA content is JS-rendered) -->
+  <section style="max-width:960px;margin:0 auto;padding:32px 20px 0;">
+    <article>
+      <h2 style="font-size:18px;margin-bottom:12px;color:var(--text);">什么是 SubHub？</h2>
+      <p style="color:var(--text-muted);font-size:14px;line-height:1.8;margin-bottom:16px;">SubHub 是一个免费的代理节点聚合与订阅格式转换平台。我们自动从多个公开的 GitHub 节点仓库采集节点，经过去重和协议解析后提供给用户使用。目前聚合了超过 4000 个节点，覆盖美国、日本、香港、新加坡、韩国、台湾、德国、英国、法国等 16 个国家和地区，支持 SS、VMess、Trojan、VLESS、Hysteria2 等主流协议。</p>
+      <h2 style="font-size:18px;margin-bottom:12px;color:var(--text);">支持哪些客户端？</h2>
+      <p style="color:var(--text-muted);font-size:14px;line-height:1.8;margin-bottom:16px;">SubHub 支持一键生成以下客户端的订阅链接：Clash（包括 Clash for Windows、Clash Verge、ClashX）、Mihomo（Meta 内核）、V2RayN、V2RayNG、Sing-Box、Surge、Shadowrocket、Quantumult X。你只需要选择客户端类型，复制订阅链接，导入即可使用。</p>
+      <h2 style="font-size:18px;margin-bottom:12px;color:var(--text);">订阅转换功能</h2>
+      <p style="color:var(--text-muted);font-size:14px;line-height:1.8;margin-bottom:16px;">除了提供免费节点，SubHub 还提供在线订阅格式转换服务。你可以将任意订阅链接或节点分享链接转换为 Clash YAML、V2Ray Base64、Sing-Box JSON、Surge 配置等格式。所有转换在服务端内存中完成，不存储任何用户数据。</p>
+      <h2 style="font-size:18px;margin-bottom:12px;color:var(--text);">完全免费开源</h2>
+      <p style="color:var(--text-muted);font-size:14px;line-height:1.8;margin-bottom:16px;">SubHub 基于 Cloudflare Pages + Workers + KV 构建，完全 Serverless 架构，零服务器成本。项目完全开源，你可以在 <a href="https://github.com/kengerlwl/subhub" style="color:var(--accent);">GitHub</a> 上查看源代码，也可以一键 Fork 部署到自己的 Cloudflare 账号。</p>
+    </article>
+  </section>
 
   <footer>
     <div class="container">
