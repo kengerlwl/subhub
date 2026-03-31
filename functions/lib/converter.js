@@ -28,7 +28,7 @@ export function toClash(nodes, rules = 'minimal', kernel = 'clash') {
 
   const proxyNames = proxies.map(p => p.name);
 
-  const ruleSet = getRuleSet(rules, proxyNames);
+  const ruleSet = getRuleSet(rules, proxyNames, kernel);
 
   const config = {
     port: 7890,
@@ -299,16 +299,24 @@ function nodeToSurgeLine(node) {
   }
 }
 
-function getRuleSet(type, proxyNames) {
+function getRuleSet(type, proxyNames, kernel = 'clash') {
   const proxy = 'Proxy';
   if (type === 'none') {
     return [`MATCH,${proxy}`];
   }
-  // minimal 和 full 都用基础规则
+
+  if (kernel === 'mihomo') {
+    return [
+      'GEOIP,LAN,DIRECT',
+      'GEOSITE,cn,DIRECT',
+      'GEOIP,CN,DIRECT',
+      `MATCH,${proxy}`,
+    ];
+  }
+
+  // Default clash-compatible rules: avoid GEOSITE and other Meta-only rule types.
   return [
     'GEOIP,LAN,DIRECT',
-    'GEOSITE,cn,DIRECT',
-    'GEOIP,CN,DIRECT',
     `MATCH,${proxy}`,
   ];
 }
